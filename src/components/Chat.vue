@@ -39,23 +39,15 @@ export default {
 
       this.chatHistory === '' ? this.chatHistory += this.chatText :  this.chatHistory += '\n\n' + this.chatText
 
-      await axios.post('https://api.openai.com/v1/completions', {
-        model: "text-davinci-002",
-        prompt: this.chatHistory,
-        temperature: 0.7,
-        max_tokens: 256,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0,
-      }, {
-        headers: {
-          Authorization: 'Bearer ' + process.env.VUE_APP_CLIENT_SECRET
-        }
-      }).then(response => {
+      let apiUrl = 'http://localhost:3000/papago?q=' + this.chatHistory
+
+      await axios.get(apiUrl).then(response => {
+        console.log('response', response)
         this.chatList.push({
-          text: response.data.choices[0].text,
+          text: response.data.message.result.translatedText,
           mine: false
         })
+        this.chatHistory += '\n\n' + response.data.message.result.translatedText
       })
 
       this.chatText = ''
